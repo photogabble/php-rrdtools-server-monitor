@@ -68,7 +68,7 @@ class RRDNetwork extends RRDBase {
 
         if(!rrd_graph($graphPath . '/network_' . $period . '.png', [
             "-s","-1$period",
-            "-t traffic on eth0",
+            "-t eth0 traffic in the last $period",
             "--lazy",
             "-h", "150", "-w", "700",
             "-l 0",

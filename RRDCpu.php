@@ -95,7 +95,7 @@ class RRDCpu extends RRDBase {
 
         if(!rrd_graph($graphPath . '/cpu_usage_' . $period . '.png', [
             "-s","-1$period",
-            "-t CPU Usage ($period)",
+            "-t CPU Usage in the last $period",
             "--lazy",
             "-h", "150", "-w", "700",
             "-l 0",

@@ -79,7 +79,7 @@ class RRDNginx extends RRDBase
 
         if(!rrd_graph($graphPath . '/requests_' . $period . '.png', [
             "-s","-1$period",
-            "-t Requests on nginx ($period)",
+            "-t Nginx Requests in the last $period",
             "--lazy",
             "-h", "150", "-w", "700",
             "-l 0",
@@ -100,7 +100,7 @@ class RRDNginx extends RRDBase
 
         if(!rrd_graph($graphPath . '/connections_' . $period . '.png', [
             "-s","-1$period",
-            "-t Connections on nginx ($period)",
+            "-t Nginx Connections in the last $period",
             "--lazy",
             "-h", "150", "-w", "700",
             "-l 0",
