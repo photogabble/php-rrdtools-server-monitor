@@ -27,7 +27,8 @@ class RRDDiskIO extends RRDBase {
 
     public function collect()
     {
-        // ...
+        $stat = $this->runCommand('cat /proc/meminfo');
+        var_dump($stat);
     }
 
     public function graph($period = 'day', $graphPath = __DIR__)
