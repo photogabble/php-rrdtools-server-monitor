@@ -39,11 +39,7 @@ class RRDNginx extends RRDBase
 
     public function collect()
     {
-        $requests = 0;
-        $total =  0;
-        $reading = 0;
-        $writing = 0;
-        $waiting = 0;
+        $requests = $total = $reading = $writing = $waiting = 0;
 
         $stat = file_get_contents($this->nginxStatsUrl);
         foreach (explode("\n", $stat) as $row) {
