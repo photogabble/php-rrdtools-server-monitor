@@ -85,7 +85,7 @@ class RRDCpu extends RRDBase {
     public function graph($period = 'day', $graphPath = __DIR__)
     {
         if (!file_exists($graphPath)) {
-            $this->fail("The path [$path] does not exist or is not readable.\n");
+            $this->fail("The path [$graphPath] does not exist or is not readable.\n");
         }
 
         $rrdFile = $this->path . DIRECTORY_SEPARATOR . 'mpstat.rrd';
