@@ -4,11 +4,10 @@ require_once(__DIR__.'/RRDBase.php');
 
 class RRDMemory extends RRDBase {
 
-    private $rrdFilePath;
+    protected $rrdFileName = 'meminfo.rrd';
 
     protected function touchGraph()
     {
-        $this->rrdFilePath = $this->path . DIRECTORY_SEPARATOR . 'meminfo.rrd';
         if (!file_exists($this->rrdFilePath)) {
             $this->debug("Creating [$this->rrdFilePath]\n");
             if (!rrd_create($this->rrdFilePath, [

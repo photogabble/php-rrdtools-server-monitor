@@ -4,11 +4,10 @@ require_once(__DIR__.'/RRDBase.php');
 
 class RRDNetwork extends RRDBase {
 
-    private $rrdFilePath;
+    protected $rrdFileName = 'ipconfig.rrd';
 
     protected function touchGraph()
     {
-        $this->rrdFilePath = $this->path . DIRECTORY_SEPARATOR . 'ipconfig.rrd';
         if (!file_exists($this->rrdFilePath)) {
             $this->debug("Creating [$this->rrdFilePath]\n");
             if (!rrd_create($this->rrdFilePath, [
@@ -76,10 +75,10 @@ class RRDNetwork extends RRDBase {
             "-a", "PNG",
             "-v bytes/sec",
             "--slope-mode",
-            "DEF:in=".$this->rrdFilePath.":in:AVERAGE",
-            "DEF:maxin=".$this->rrdFilePath.":in:MAX",
-            "DEF:out=".$this->rrdFilePath.":out:AVERAGE",
-            "DEF:maxout=".$this->rrdFilePath.":out:MAX",
+            "DEF:in={$this->rrdFilePath}:in:AVERAGE",
+            "DEF:maxin={$this->rrdFilePath}:in:MAX",
+            "DEF:out={$this->rrdFilePath}:out:AVERAGE",
+            "DEF:maxout={$this->rrdFilePath}:out:MAX",
 
             "CDEF:out_neg=out,-1,*",
             "CDEF:maxout_neg=maxout,-1,*",

@@ -2,8 +2,9 @@
 
 abstract class RRDBase {
 
+    protected $rrdFileName = 'changeme.rrd';
+    protected $rrdFilePath;
     protected $path;
-
     private $debug = false;
 
     public function __construct($path = __DIR__, $debug = false)
@@ -14,6 +15,7 @@ abstract class RRDBase {
         }
         $this->path = $path;
         $this->debug = $debug;
+        $this->rrdFilePath = $this->path . DIRECTORY_SEPARATOR . $this->rrdFileName;
         $this->touchGraph();
     }
 

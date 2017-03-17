@@ -4,6 +4,7 @@ require_once(__DIR__.'/RRDBase.php');
 
 class RRDCpu extends RRDBase {
 
+    protected $rrdFileName = 'mpstat.rrd';
     private $interval = 1;
 
     public function setInterval($interval)
@@ -13,10 +14,9 @@ class RRDCpu extends RRDBase {
 
     protected function touchGraph()
     {
-        $rrdFile = $this->path . DIRECTORY_SEPARATOR . 'mpstat.rrd';
-        if (!file_exists($rrdFile)) {
-            $this->debug("creating [$rrdFile]\n");
-            if (!rrd_create($rrdFile, [
+        if (!file_exists($this->rrdFilePath)) {
+            $this->debug("Creating [$this->rrdFilePath]\n");
+            if (!rrd_create($this->rrdFilePath, [
                 "-s",60,
                 "DS:usr:GAUGE:120:0:100",
                 "DS:nice:GAUGE:120:0:100",
@@ -35,7 +35,7 @@ class RRDCpu extends RRDBase {
             ])){
                 $this->fail(rrd_error());
             }
-            $this->debug("Created [$rrdFile]\n");
+            $this->debug("Created [$this->rrdFilePath]\n");
         }
     }
 
@@ -77,9 +77,7 @@ class RRDCpu extends RRDBase {
             $this->fail("Error parsing output of mpstat 1 1\n");
         }
 
-        $rrdFile = $this->path . DIRECTORY_SEPARATOR . 'mpstat.rrd';
-
-        if (!rrd_update($rrdFile, [
+        if (!rrd_update($this->rrdFilePath, [
             "-t",
             implode(':', $keys),
             "N:" . implode(':', $values)
@@ -95,8 +93,6 @@ class RRDCpu extends RRDBase {
             $this->fail("The path [$graphPath] does not exist or is not readable.\n");
         }
 
-        $rrdFile = $this->path . DIRECTORY_SEPARATOR . 'mpstat.rrd';
-
         if(!rrd_graph($graphPath . '/cpu_usage_' . $period . '.png', [
             "-s","-1$period",
             "-t CPU Usage ($period)",
@@ -109,16 +105,16 @@ class RRDCpu extends RRDBase {
             "--upper-limit=100",
             "--lower-limit=0",
             "--rigid",
-            "DEF:usr=$rrdFile:usr:AVERAGE",
-            "DEF:nice=$rrdFile:nice:AVERAGE",
-            "DEF:sys=$rrdFile:sys:AVERAGE",
-            "DEF:iowait=$rrdFile:iowait:AVERAGE",
-            "DEF:irq=$rrdFile:irq:AVERAGE",
-            "DEF:soft=$rrdFile:soft:AVERAGE",
-            "DEF:steal=$rrdFile:steal:AVERAGE",
-            "DEF:guest=$rrdFile:guest:AVERAGE",
-            "DEF:gnice=$rrdFile:gnice:AVERAGE",
-            "DEF:idle=$rrdFile:idle:AVERAGE",
+            "DEF:usr={$this->rrdFilePath}:usr:AVERAGE",
+            "DEF:nice={$this->rrdFilePath}:nice:AVERAGE",
+            "DEF:sys={$this->rrdFilePath}:sys:AVERAGE",
+            "DEF:iowait={$this->rrdFilePath}:iowait:AVERAGE",
+            "DEF:irq={$this->rrdFilePath}:irq:AVERAGE",
+            "DEF:soft={$this->rrdFilePath}:soft:AVERAGE",
+            "DEF:steal={$this->rrdFilePath}:steal:AVERAGE",
+            "DEF:guest={$this->rrdFilePath}:guest:AVERAGE",
+            "DEF:gnice={$this->rrdFilePath}:gnice:AVERAGE",
+            "DEF:idle={$this->rrdFilePath}:idle:AVERAGE",
 
             "AREA:usr#2C3E50:User:STACK",               // *
             "GPRINT:usr:LAST:     Current\\: %5.2lf%%",

@@ -6,7 +6,7 @@ require_once(__DIR__.'/RRDBase.php');
 
 class RRDNginx extends RRDBase
 {
-    private $rrdFilePath;
+    protected $rrdFileName = 'test.rrd';
     private $nginxStatsUrl;
 
     public function setNginxStatsUrl($nginxStatsUrl)
@@ -16,7 +16,6 @@ class RRDNginx extends RRDBase
 
     protected function touchGraph()
     {
-        $this->rrdFilePath = $this->path . DIRECTORY_SEPARATOR . 'test.rrd';
         if (!file_exists($this->rrdFilePath)) {
             $this->debug("Creating [$this->rrdFilePath]\n");
             if (!rrd_create($this->rrdFilePath, [
@@ -110,10 +109,10 @@ class RRDNginx extends RRDBase
             "-v requests/sec",
             "-Y",
             "--units-exponent=0",
-            "DEF:total=".$this->rrdFilePath.":total:AVERAGE",
-            "DEF:reading=".$this->rrdFilePath.":reading:AVERAGE",
-            "DEF:writing=".$this->rrdFilePath.":writing:AVERAGE",
-            "DEF:waiting=".$this->rrdFilePath.":waiting:AVERAGE",
+            "DEF:total={$this->rrdFilePath}:total:AVERAGE",
+            "DEF:reading={$this->rrdFilePath}:reading:AVERAGE",
+            "DEF:writing={$this->rrdFilePath}:writing:AVERAGE",
+            "DEF:waiting={$this->rrdFilePath}:waiting:AVERAGE",
 
             "LINE2:total#27AE60:Total",
             "GPRINT:total:LAST:   Current\\: %5.2lf",
