@@ -6,7 +6,7 @@ require_once(__DIR__.'/RRDBase.php');
 
 class RRDNginx extends RRDBase
 {
-    protected $rrdFileName = 'test.rrd';
+    protected $rrdFileName = 'nginx.rrd';
     private $nginxStatsUrl;
 
     public function setNginxStatsUrl($nginxStatsUrl)
