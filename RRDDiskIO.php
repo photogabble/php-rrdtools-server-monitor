@@ -34,7 +34,7 @@ class RRDDiskIO extends RRDBase {
     private function createGraph($device) {
         if (!file_exists($this->rrdFilePath[$device])) {
             $this->debug("Creating [{$this->rrdFilePath[$device]}]\n");
-            if (!rrd_create($this->rrdFilePath, [
+            if (!rrd_create($this->rrdFilePath[$device], [
                 "-s",60,
                 // rrqm/s wrqm/s
                 "DS:RRMerge:GAUGE:120:0:U",
