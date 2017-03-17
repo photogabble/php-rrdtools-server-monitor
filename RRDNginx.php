@@ -156,4 +156,4 @@ $p->graph('week', __DIR__ . '/../httpdocs/img');
 $p->graph('month', __DIR__ . '/../httpdocs/img');
 $p->graph('year', __DIR__ . '/../httpdocs/img');
 
-file_put_contents($logPath . '/timestamp.js', 'function getTimestamp(){ return '.json_encode(['date' => date('c')]).'; }');
+// file_put_contents($logPath . '/timestamp.js', 'function getTimestamp(){ return '.json_encode(['date' => date('c')]).'; }');
