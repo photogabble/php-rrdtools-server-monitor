@@ -104,7 +104,7 @@ class RRDNetwork extends RRDBase {
     }
 }
 
-$p = new RRDNetwork(__DIR__, 1, true);
+$p = new RRDNetwork(__DIR__, true);
 $p->collect();
 $p->graph('hour', __DIR__ . '/../httpdocs/img');
 $p->graph('day', __DIR__ . '/../httpdocs/img');

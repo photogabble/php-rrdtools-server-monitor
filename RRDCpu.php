@@ -4,6 +4,13 @@ require_once(__DIR__.'/RRDBase.php');
 
 class RRDCpu extends RRDBase {
 
+    private $interval = 1;
+
+    public function setInterval($interval)
+    {
+        $this->interval = $interval;
+    }
+
     protected function touchGraph()
     {
         $rrdFile = $this->path . DIRECTORY_SEPARATOR . 'mpstat.rrd';
@@ -175,7 +182,8 @@ class RRDCpu extends RRDBase {
     }
 }
 
-$p = new RRDCpu(__DIR__, 1, true);
+$p = new RRDCpu(__DIR__, true);
+$p->setInterval(1);
 $p->collect();
 $p->graph('hour', __DIR__ . '/../httpdocs/img');
 $p->graph('day', __DIR__ . '/../httpdocs/img');

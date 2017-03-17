@@ -148,7 +148,7 @@ class RRDNginx extends RRDBase
 
 }
 
-$p = new RRDNginx(__DIR__, 1, true);
+$p = new RRDNginx(__DIR__, true);
 $p->setNginxStatsUrl('http://127.0.0.1/nginx_status');
 $p->collect();
 $p->graph('hour', __DIR__ . '/../httpdocs/img');

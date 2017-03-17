@@ -2,18 +2,16 @@
 
 abstract class RRDBase {
 
-    protected $interval;
     protected $path;
 
     private $debug = false;
 
-    public function __construct($path = __DIR__, $interval = 10, $debug = false)
+    public function __construct($path = __DIR__, $debug = false)
     {
         if (!file_exists($path)) {
             echo "The path [$path] does not exist or is not readable.\n";
             exit(1);
         }
-        $this->interval = $interval;
         $this->path = $path;
         $this->debug = $debug;
         $this->touchGraph();
@@ -24,7 +22,7 @@ abstract class RRDBase {
     abstract public function collect();
 
     abstract public function graph($period = 'day', $graphPath = __DIR__);
-    
+
     protected function debug($text)
     {
         if ($this->debug === true) {
