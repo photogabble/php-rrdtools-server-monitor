@@ -51,7 +51,7 @@ class RRDNetwork extends RRDBase {
         $trafficOutBytes = $this->runCommand('ifconfig eth0 | grep bytes | cut -d":" -f3|cut -d" " -f1');
 
         $this->debug("Traffic in/out: $trafficInBytes/$trafficOutBytes bytes.\n");
- 
+
         if (!rrd_update($this->rrdFilePath, [
             "-t",
             "in:out",
@@ -64,7 +64,7 @@ class RRDNetwork extends RRDBase {
     public function graph($period = 'day', $graphPath = __DIR__)
     {
         if (!file_exists($graphPath)) {
-            $this->fail("The path [$path] does not exist or is not readable.\n");
+            $this->fail("The path [$graphPath] does not exist or is not readable.\n");
         }
 
         if(!rrd_graph($graphPath . '/network_' . $period . '.png', [
@@ -99,7 +99,7 @@ class RRDNetwork extends RRDBase {
 
             "HRULE:0#000000"
         ])) {
-            $this->fail('Error writing connections graph for period '. $period  .' ['. rrd_error() .']');
+            $this->fail('Error writing network graph for period '. $period  .' ['. rrd_error() .']');
         }
     }
 }
