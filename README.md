@@ -5,4 +5,7 @@ This provides monitoring with minute resolution for Nginx, CPU Usage, Network Tr
 
 In the future I will be adding IO and MySQL monitoring.
 
+## Requirements
 
+* [php-rrd](http://php.net/manual/en/book.rrd.php) extension be installed - install on Ubuntu via `apt-get install php-rrd`
+* [sysstat](http://sebastien.godard.pagesperso-orange.fr/) package be installed. This includes the mpstat command used for CPU reporting - install on Ubuntu via `apt-get install sysstat`
