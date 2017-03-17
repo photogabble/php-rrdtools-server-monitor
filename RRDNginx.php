@@ -88,12 +88,17 @@ class RRDNginx extends RRDBase
             "-v requests/sec",
             "-Y",
             "--units-exponent=0",
+            "--pango-markup",
+
             "DEF:requests=".$this->rrdFilePath.":requests:AVERAGE",
             "LINE2:requests#27AE60:Requests",
             "GPRINT:requests:MAX:  Max\\: %5.2lf",
             "GPRINT:requests:AVERAGE: Avg\\: %5.2lf",
-            "GPRINT:requests:LAST: Current\\: %5.2lf req/sec",
-            "HRULE:0#000000"
+            "GPRINT:requests:LAST: Current\\: %5.2lf req/sec\\n",
+
+            "HRULE:0#000000",
+
+            'COMMENT:<span foreground="#ABABAB" size="x-small">'. date('D M jS H') . '\:' . date('i') . '\:' . date('s') .'</span>\r'
         ])) {
             $this->fail('Error writing requests graph for period '. $period  .' ['. rrd_error() .']');
         }
@@ -109,6 +114,8 @@ class RRDNginx extends RRDBase
             "-v requests/sec",
             "-Y",
             "--units-exponent=0",
+            "--pango-markup",
+
             "DEF:total={$this->rrdFilePath}:total:AVERAGE",
             "DEF:reading={$this->rrdFilePath}:reading:AVERAGE",
             "DEF:writing={$this->rrdFilePath}:writing:AVERAGE",
@@ -138,7 +145,9 @@ class RRDNginx extends RRDBase
             "GPRINT:waiting:AVERAGE: Avg\\: %5.2lf",
             "GPRINT:waiting:MAX:  Max\\: %5.2lf\\n",
 
-            "HRULE:0#000000"
+            "HRULE:0#000000",
+
+            'COMMENT:<span foreground="#ABABAB" size="x-small">'. date('D M jS H') . '\:' . date('i') . '\:' . date('s') .'</span>\r'
 
         ])) {
             $this->fail('Error writing connections graph for period '. $period  .' ['. rrd_error() .']');

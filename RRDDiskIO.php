@@ -201,6 +201,9 @@ class RRDDiskIO extends RRDBase {
             "-h", "150", "-w", "700",
             "-l 0",
             "-a", "PNG",
+            "--pango-markup",
+            "--lower-limit=0",
+            "--units-exponent=0",
             "-v Utilization %"
         ];
 
@@ -210,7 +213,7 @@ class RRDDiskIO extends RRDBase {
         }
 
         foreach ($this->devices as $device) {
-            $colour = array_pop($colours);
+            $colour = array_shift($colours);
             $config = array_merge($config, [
                 "LINE2:{$device}Avg{$colour}:" . $device . ' Utilization',
                 "GPRINT:{$device}Avg:LAST:   Current\\: %5.2lf%%",
@@ -219,6 +222,8 @@ class RRDDiskIO extends RRDBase {
                 "GPRINT:{$device}Avg:AVERAGE: Avg\\: %5.2lf%%\\n",
             ]);
         }
+
+        array_push($config, 'COMMENT:<span foreground="#ABABAB" size="x-small">'. date('D M jS H') . '\:' . date('i') . '\:' . date('s') .'</span>\r');
 
         if(!rrd_graph($graphPath . '/disk_usage_' . $period . '.png', $config)) {
             $this->fail('Error writing connections graph for period '. $period  .' ['. rrd_error() .']');
@@ -230,3 +235,7 @@ class RRDDiskIO extends RRDBase {
 $p = new RRDDiskIO(__DIR__, true, ['nb0', 'nb1']);
 $p->collect();
 $p->graph('hour', __DIR__ . '/../httpdocs/img');
+$p->graph('day', __DIR__ . '/../httpdocs/img');
+$p->graph('week', __DIR__ . '/../httpdocs/img');
+$p->graph('month', __DIR__ . '/../httpdocs/img');
+$p->graph('year', __DIR__ . '/../httpdocs/img');

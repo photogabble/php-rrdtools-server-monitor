@@ -75,6 +75,8 @@ class RRDNetwork extends RRDBase {
             "-a", "PNG",
             "-v bytes/sec",
             "--slope-mode",
+            "--pango-markup",
+            
             "DEF:in={$this->rrdFilePath}:in:AVERAGE",
             "DEF:maxin={$this->rrdFilePath}:in:MAX",
             "DEF:out={$this->rrdFilePath}:out:AVERAGE",
@@ -96,7 +98,9 @@ class RRDNetwork extends RRDBase {
             "GPRINT:out:AVERAGE: Avg\\: %6.1lf %S",
             "GPRINT:out:LAST: Current\\: %6.1lf %SBytes/sec\\n",
 
-            "HRULE:0#000000"
+            "HRULE:0#000000",
+
+            'COMMENT:<span foreground="#ABABAB" size="x-small">'. date('D M jS H') . '\:' . date('i') . '\:' . date('s') .'</span>\r'
         ])) {
             $this->fail('Error writing network graph for period '. $period  .' ['. rrd_error() .']');
         }

@@ -105,6 +105,7 @@ class RRDCpu extends RRDBase {
             "--upper-limit=100",
             "--lower-limit=0",
             "--rigid",
+            "--pango-markup",
             "DEF:usr={$this->rrdFilePath}:usr:AVERAGE",
             "DEF:nice={$this->rrdFilePath}:nice:AVERAGE",
             "DEF:sys={$this->rrdFilePath}:sys:AVERAGE",
@@ -170,7 +171,9 @@ class RRDCpu extends RRDBase {
             "GPRINT:idle:AVERAGE:Average\\: %5.2lf%%",
             "GPRINT:idle:MAX:Max\\: %5.2lf%%\\n",
 
-            "HRULE:0#000000"
+            "HRULE:0#000000",,
+
+            'COMMENT:<span foreground="#ABABAB" size="x-small">'. date('D M jS H') . '\:' . date('i') . '\:' . date('s') .'</span>\r'
 
         ])) {
             $this->fail('Error writing connections graph for period '. $period  .' ['. rrd_error() .']');

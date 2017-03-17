@@ -134,6 +134,8 @@ class RRDMemory extends RRDBase {
             "-l 0",
             "-a", "PNG",
             "-v RAM (bytes)",
+            "--pango-markup",
+            
             "DEF:total={$this->rrdFilePath}:memTotal:AVERAGE",
 
             "DEF:used={$this->rrdFilePath}:memUsed:AVERAGE",
@@ -190,6 +192,8 @@ class RRDMemory extends RRDBase {
 
             "LINE1:total#21392D:Total",
             'GPRINT:total:LAST:%5.1lf %sB   \l',
+
+            'COMMENT:<span foreground="#ABABAB" size="x-small">'. date('D M jS H') . '\:' . date('i') . '\:' . date('s') .'</span>\r'
 
         ])) {
             $this->fail('Error writing connections graph for period '. $period  .' ['. rrd_error() .']');
