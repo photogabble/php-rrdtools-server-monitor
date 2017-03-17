@@ -135,8 +135,10 @@ class RRDMemory extends RRDBase {
             "-a", "PNG",
             "-v RAM (bytes)",
             "--pango-markup",
-            
+
             "DEF:total={$this->rrdFilePath}:memTotal:AVERAGE",
+
+            "DEF:available={$this->rrdFilePath}:memAvailable:AVERAGE",
 
             "DEF:used={$this->rrdFilePath}:memUsed:AVERAGE",
             "DEF:maxUsage={$this->rrdFilePath}:memUsed:MAX",
@@ -192,6 +194,11 @@ class RRDMemory extends RRDBase {
 
             "LINE1:total#21392D:Total",
             'GPRINT:total:LAST:%5.1lf %sB   \l',
+
+            "COMMENT:   ",
+
+            "LINE1:available#0EAD9A:Available",
+            'GPRINT:available:LAST:%5.1lf %sB   \l',
 
             'COMMENT:<span foreground="#ABABAB" size="x-small">'. date('D M jS H') . '\:' . date('i') . '\:' . date('s') .'</span>\r'
 
