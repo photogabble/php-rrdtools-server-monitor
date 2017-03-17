@@ -128,7 +128,44 @@ class RRDDiskIO extends RRDBase {
             }
         }
 
-        // var_dump($collection);
+        $update = end($collection);
+
+        $keys = [];
+        $values = [];
+        $mapping = [
+            'rrqm/s' => 'RRMerge',
+            'wrqm/s' => 'WRMerge',
+            'r/s' => 'RReq',
+            'w/s' => 'WReq',
+            'rkB/s' => 'RByte',
+            'wkB/s' => 'WByte',
+            'avgrq-sz' => 'RSize',
+            'avgqu-sz' => 'QLength',
+            'await' => 'WTime',
+            'r_await' => 'RWTime',
+            'w_await' => 'WWTime',
+            'svctm' => 'STime',
+            '%util' => 'Util'
+        ];
+
+        foreach ($mapping as $from => $to){
+            if (isset($update[$from])) {
+                array_push($keys, $to);
+                if (in_array($from,['rkB/s', 'wkB/s'])) {
+                    array_push($values, (float) ($update[$from] * 1024)); // We want these at Bytes not KB
+                    continue;
+                }
+                array_push($values, (float) $update[$from]);
+            }
+        }
+
+        if (!rrd_update($this->rrdFilePath[$device], [
+            "-t",
+            implode(':', $keys),
+            'N:' . implode(':', $values)
+        ])){
+            $this->fail(rrd_error());
+        }
     }
 
     public function collect()
@@ -143,6 +180,50 @@ class RRDDiskIO extends RRDBase {
         if (!file_exists($graphPath)) {
             $this->fail("The path [$graphPath] does not exist or is not readable.\n");
         }
+
+        $colours = [
+            '#2C3E50',
+            '#0EAD9A',
+            '#F8C82D',
+            '#E84B3A',
+            '#832D51',
+            '#74525F',
+            '#404148',
+            '#6EC198',
+            '#27AE60'
+        ];
+
+        $config = [
+            "-s","-1$period",
+            "-t Disk Utilization in the last $period",
+            "-z",
+            "--lazy",
+            "-h", "150", "-w", "700",
+            "-l 0",
+            "-a", "PNG",
+            "-v Utilization %"
+        ];
+
+        foreach ($this->devices as $device) {
+            array_push($config, "DEF:{$device}Avg={$this->rrdFilePath[$device]}:Util:AVERAGE");
+            array_push($config, "DEF:{$device}Max={$this->rrdFilePath[$device]}:Util:MAX");
+        }
+
+        foreach ($this->devices as $device) {
+            $colour = array_pop($colours);
+            $config = array_merge($config, [
+                "LINE2:{$device}Avg{$colour}:" . $device . ' Utilization',
+                "GPRINT:{$device}Avg:LAST:   Current\\: %5.2lf%%",
+                "GPRINT:{$device}Avg:MIN:  Min\\: %5.2lf%%",
+                "GPRINT:{$device}Max:MAX:  Max\\: %5.2lf%%",
+                "GPRINT:{$device}Avg:AVERAGE: Avg\\: %5.2lf%%\\n",
+            ]);
+        }
+
+        if(!rrd_graph($graphPath . '/disk_usage_' . $period . '.png', $config)) {
+            $this->fail('Error writing connections graph for period '. $period  .' ['. rrd_error() .']');
+        }
+
     }
 }
 
