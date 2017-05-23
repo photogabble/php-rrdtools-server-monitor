@@ -38,7 +38,7 @@ class RRDDiskUsage extends RRDBase {
                 "-s",60,
                 
                 // bytes used
-                "DS:Util:GAUGE:120:0:U",
+                "DS:BytesUsed:GAUGE:120:0:U",
                 
                 // %util
                 "DS:Util:GAUGE:120:0:U",
@@ -108,7 +108,7 @@ class RRDDiskUsage extends RRDBase {
     }
 }
 
-$p = new RRDDiskIO(__DIR__, true, ['/dev/nb0', '/dev/nb1']);
+$p = new RRDDiskUsage(__DIR__, true, ['/dev/nb0', '/dev/nb1']);
 $p->collect();
 $p->graph('hour', __DIR__ . '/../httpdocs/img');
 $p->graph('day', __DIR__ . '/../httpdocs/img');
