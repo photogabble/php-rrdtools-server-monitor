@@ -9,13 +9,13 @@ class RRDDiskUsage extends RRDBase {
     private $iterations = 2;
     private $devices = [];
 
-    public function __construct($path = __DIR__, $debug = false, array $device = ['/dev/nb0']){
+    public function __construct($path = __DIR__, $debug = false, array $device = ['nbd0' => '/dev/nbd0']){
         parent::__construct($path, $debug);
 
         $this->devices = $device;
         $this->rrdFilePath = [];
 
-        foreach ($this->devices as $device) {
+        foreach ($this->devices as $device => $path) {
             $this->rrdFilePath[$device] = $this->path . DIRECTORY_SEPARATOR . 'diskusage-' . $device . '.rrd';
         }
         $this->touchGraph();
@@ -108,7 +108,7 @@ class RRDDiskUsage extends RRDBase {
     }
 }
 
-$p = new RRDDiskUsage(__DIR__, true, ['/dev/nb0', '/dev/nb1']);
+$p = new RRDDiskUsage(__DIR__, true, ['nbd0' => '/dev/nbd0', 'nbd1' => '/dev/nbd1']);
 $p->collect();
 $p->graph('hour', __DIR__ . '/../httpdocs/img');
 $p->graph('day', __DIR__ . '/../httpdocs/img');
