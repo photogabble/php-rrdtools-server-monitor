@@ -26,7 +26,7 @@ class RRDDiskUsage extends RRDBase {
         if (count($this->devices) < 1) {
             return;
         }
-        foreach ($this->devices as $device) {
+        foreach (array_keys($this->devices) as $device) {
             $this->createGraph($device);
         }
     }
@@ -72,16 +72,16 @@ class RRDDiskUsage extends RRDBase {
         return trim($stat);
     }
 
-    private function collectForDevice($device)
+    private function collectForDevice($device, $path)
     {
-        $stat = $this->runCommand("df {$device}");
+        $stat = $this->runCommand("df {$path}");
         // ...
     }
 
     public function collect()
     {
-        foreach ($this->devices as $device) {
-            $this->collectForDevice($device);
+        foreach ($this->devices as $device => $path) {
+            $this->collectForDevice($device, $path);
         }
     }
 
