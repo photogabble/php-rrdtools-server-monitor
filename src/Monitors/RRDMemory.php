@@ -1,12 +1,12 @@
 <?php
 
-require_once(__DIR__.'/RRDBase.php');
+namespace Carbontwelve\Monitor\Monitors;
 
 class RRDMemory extends RRDBase {
 
     protected $rrdFileName = 'meminfo.rrd';
 
-    protected function touchGraph()
+    public function touchGraph()
     {
         if (!file_exists($this->rrdFilePath)) {
             $this->debug("Creating [$this->rrdFilePath]\n");
@@ -208,10 +208,10 @@ class RRDMemory extends RRDBase {
     }
 }
 
-$p = new RRDMemory(__DIR__, true);
-$p->collect();
-$p->graph('hour', __DIR__ . '/../httpdocs/img');
-$p->graph('day', __DIR__ . '/../httpdocs/img');
-$p->graph('week', __DIR__ . '/../httpdocs/img');
-$p->graph('month', __DIR__ . '/../httpdocs/img');
-$p->graph('year', __DIR__ . '/../httpdocs/img');
+// $p = new RRDMemory(__DIR__, true);
+// $p->collect();
+// $p->graph('hour', __DIR__ . '/../httpdocs/img');
+// $p->graph('day', __DIR__ . '/../httpdocs/img');
+// $p->graph('week', __DIR__ . '/../httpdocs/img');
+// $p->graph('month', __DIR__ . '/../httpdocs/img');
+// $p->graph('year', __DIR__ . '/../httpdocs/img');

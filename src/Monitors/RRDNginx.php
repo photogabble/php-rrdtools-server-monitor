@@ -1,20 +1,26 @@
 <?php
 
-// https://easyengine.io/tutorials/nginx/status-page/
+namespace Carbontwelve\Monitor\Monitors;
 
-require_once(__DIR__.'/RRDBase.php');
+// https://easyengine.io/tutorials/nginx/status-page/
 
 class RRDNginx extends RRDBase
 {
-    protected $rrdFileName = 'nginx.rrd';
-    private $nginxStatsUrl;
+    protected $configuration = [
+        'statsUrl' => ''
+    ];
 
-    public function setNginxStatsUrl($nginxStatsUrl)
+    protected function configurationLoaded()
     {
-        $this->nginxStatsUrl = $nginxStatsUrl;
+        if (empty($this->configuration['statsUrl'])) {
+            return false;
+        }
+        return parent::configurationLoaded();
     }
 
-    protected function touchGraph()
+    protected $rrdFileName = 'nginx.rrd';
+
+    public function touchGraph()
     {
         if (!file_exists($this->rrdFilePath)) {
             $this->debug("Creating [$this->rrdFilePath]\n");
@@ -40,7 +46,7 @@ class RRDNginx extends RRDBase
     {
         $requests = $total = $reading = $writing = $waiting = 0;
 
-        $stat = file_get_contents($this->nginxStatsUrl);
+        $stat = file_get_contents($this->configuration['statsUrl']);
         foreach (explode("\n", $stat) as $row) {
             if (preg_match('/^Active connections:\s+(\d+)/', $row, $matches) === 1) {
                 $total = $matches[1];
@@ -156,13 +162,13 @@ class RRDNginx extends RRDBase
 
 }
 
-$p = new RRDNginx(__DIR__, true);
-$p->setNginxStatsUrl('http://127.0.0.1/nginx_status');
-$p->collect();
-$p->graph('hour', __DIR__ . '/../httpdocs/img');
-$p->graph('day', __DIR__ . '/../httpdocs/img');
-$p->graph('week', __DIR__ . '/../httpdocs/img');
-$p->graph('month', __DIR__ . '/../httpdocs/img');
-$p->graph('year', __DIR__ . '/../httpdocs/img');
+// $p = new RRDNginx(__DIR__, true);
+// $p->setNginxStatsUrl('http://127.0.0.1/nginx_status');
+// $p->collect();
+// $p->graph('hour', __DIR__ . '/../httpdocs/img');
+// $p->graph('day', __DIR__ . '/../httpdocs/img');
+// $p->graph('week', __DIR__ . '/../httpdocs/img');
+// $p->graph('month', __DIR__ . '/../httpdocs/img');
+// $p->graph('year', __DIR__ . '/../httpdocs/img');
 
 // file_put_contents($logPath . '/timestamp.js', 'function getTimestamp(){ return '.json_encode(['date' => date('c')]).'; }');

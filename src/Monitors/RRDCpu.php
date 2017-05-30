@@ -1,18 +1,16 @@
 <?php
 
-require_once(__DIR__.'/RRDBase.php');
+namespace Carbontwelve\Monitor\Monitors;
 
 class RRDCpu extends RRDBase {
 
     protected $rrdFileName = 'mpstat.rrd';
-    private $interval = 1;
 
-    public function setInterval($interval)
-    {
-        $this->interval = $interval;
-    }
+    protected $configuration = [
+        'interval' => 1
+    ];
 
-    protected function touchGraph()
+    public function touchGraph()
     {
         if (!file_exists($this->rrdFilePath)) {
             $this->debug("Creating [$this->rrdFilePath]\n");
@@ -42,7 +40,7 @@ class RRDCpu extends RRDBase {
     public function collect()
     {
         $tmpPathName = $this->path . DIRECTORY_SEPARATOR . "mpstat.tmp";
-        $cmd = "mpstat {$this->interval} 1 > " . $tmpPathName;
+        $cmd = "mpstat {$this->configuration['interval']} 1 > " . $tmpPathName;
         $this->debug("Executing: [$cmd]\n");
         exec($cmd);
         if (!file_exists($tmpPathName)) {
@@ -182,11 +180,11 @@ class RRDCpu extends RRDBase {
     }
 }
 
-$p = new RRDCpu(__DIR__, true);
-$p->setInterval(1);
-$p->collect();
-$p->graph('hour', __DIR__ . '/../httpdocs/img');
-$p->graph('day', __DIR__ . '/../httpdocs/img');
-$p->graph('week', __DIR__ . '/../httpdocs/img');
-$p->graph('month', __DIR__ . '/../httpdocs/img');
-$p->graph('year', __DIR__ . '/../httpdocs/img');
+// $p = new RRDCpu(__DIR__, true);
+// $p->setInterval(1);
+// $p->collect();
+// $p->graph('hour', __DIR__ . '/../httpdocs/img');
+// $p->graph('day', __DIR__ . '/../httpdocs/img');
+// $p->graph('week', __DIR__ . '/../httpdocs/img');
+// $p->graph('month', __DIR__ . '/../httpdocs/img');
+// $p->graph('year', __DIR__ . '/../httpdocs/img');

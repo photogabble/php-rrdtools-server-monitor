@@ -1,11 +1,39 @@
 <?php
 
-abstract class RRDBase {
+namespace Carbontwelve\Monitor\Monitors;
 
+abstract class RRDBase
+{
     protected $rrdFileName = 'changeme.rrd';
     protected $rrdFilePath;
     protected $path;
     private $debug = false;
+
+    protected $configuration = [];
+
+    /**
+     * @param null|string $key
+     * @param null|mixed $default
+     * @return mixed
+     */
+    public function getConfiguration($key = null, $default = null)
+    {
+        if (is_null($key)) {
+            return $this->configuration;
+        }
+
+        if (!isset($this->configuration[$key])) {
+            return $default;
+        }
+
+        return $this->configuration[$key];
+    }
+
+    public function setConfiguration(array $configuration)
+    {
+        $this->configuration = $configuration;
+        return $this->configurationLoaded();
+    }
 
     public function __construct($path = __DIR__, $debug = false)
     {
@@ -16,10 +44,15 @@ abstract class RRDBase {
         $this->path = $path;
         $this->debug = $debug;
         $this->rrdFilePath = $this->path . DIRECTORY_SEPARATOR . $this->rrdFileName;
-        $this->touchGraph();
+        //$this->touchGraph();
     }
 
-    abstract protected function touchGraph();
+    // Function to call after configuration is set
+    protected function configurationLoaded() {
+        return true;
+    }
+
+    abstract public function touchGraph();
 
     abstract public function collect();
 
