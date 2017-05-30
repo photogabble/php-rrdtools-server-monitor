@@ -4,9 +4,6 @@ require_once(__DIR__.'/RRDBase.php');
 
 class RRDDiskUsage extends RRDBase {
 
-    protected $rrdFileName = 'diskusage.rrd';
-    private $interval = 10;
-    private $iterations = 2;
     private $devices = [];
 
     public function __construct($path = __DIR__, $debug = false, array $device = ['nbd0' => '/dev/nbd0']){
@@ -36,10 +33,13 @@ class RRDDiskUsage extends RRDBase {
             $this->debug("Creating [{$this->rrdFilePath[$device]}]\n");
             if (!rrd_create($this->rrdFilePath[$device], [
                 "-s",60,
-                
+
                 // bytes used
                 "DS:BytesUsed:GAUGE:120:0:U",
-                
+
+                // bytes available
+                "DS:BytesAvailable:GAUGE:120:0:U",
+
                 // %util
                 "DS:Util:GAUGE:120:0:U",
 
@@ -75,7 +75,32 @@ class RRDDiskUsage extends RRDBase {
     private function collectForDevice($device, $path)
     {
         $stat = $this->runCommand("df {$path}");
-        // ...
+        $stat = explode("\n", $stat);
+        $stat = end($stat); // Only interested in last line
+        $stat = preg_replace('!\s+!', ' ', $stat);
+        $stat = explode(" ", $stat);
+
+        if (count($stat) < 6) {
+            $this->fail("Error parsing output of df\n");
+        }
+
+        $stats = [
+            'Util' => $stat[4],
+            'BytesUsed' => $stat[2] * 1024,
+            'BytesAvailable' => $stat[3] * 1024
+        ];
+
+        if (strpos($stats['Util'], '%') !== false) {
+            $stats['Util'] = substr($stats['Util'], 0, strpos($stats['Util'], '%'));
+        }
+
+        if (!rrd_update($this->rrdFilePath[$device], [
+            "-t",
+            implode(':', array_keys($stats)),
+            'N:' . implode(':', array_values($stats))
+        ])){
+            $this->fail(rrd_error());
+        }
     }
 
     public function collect()
@@ -103,8 +128,45 @@ class RRDDiskUsage extends RRDBase {
             '#27AE60'
         ];
 
-        // ...
+        $config = [
+            "-s","-1$period",
+            "-t Disk Consumption in the last $period",
+            "-z",
+            "--lazy",
+            "-h", "150", "-w", "700",
+            "-l 0",
+            "-b", "1024",
+            "-a", "PNG",
+            "--pango-markup",
+            "--lower-limit=0",
+            "--units-exponent=0",
+            "-v Consumption %"
+        ];
 
+        foreach ($this->devices as $device => $path) {
+            array_push($config, "DEF:{$device}TotalBytesUsed={$this->rrdFilePath[$device]}:BytesUsed:LAST");
+
+            array_push($config, "DEF:{$device}AvgUtil={$this->rrdFilePath[$device]}:Util:AVERAGE");
+            array_push($config, "DEF:{$device}MaxUtil={$this->rrdFilePath[$device]}:Util:MAX");
+        }
+
+        foreach ($this->devices as $device => $path) {
+            $colour = array_shift($colours);
+            $config = array_merge($config, [
+                "LINE2:{$device}AvgUtil{$colour}:" . $device,
+                "GPRINT:{$device}AvgUtil:LAST:   Current\\: %5.2lf%%",
+                "GPRINT:{$device}AvgUtil:MIN:  Min\\: %5.2lf%%",
+                "GPRINT:{$device}MaxUtil:MAX:  Max\\: %5.2lf%%",
+                "GPRINT:{$device}AvgUtil:AVERAGE: Avg\\: %5.2lf%%",
+                "GPRINT:{$device}TotalBytesUsed:LAST: Used\\: %5.2lf %sB\\n",
+            ]);
+        }
+
+        array_push($config, 'COMMENT:<span foreground="#ABABAB" size="x-small">'. date('D M jS H') . '\:' . date('i') . '\:' . date('s') .'</span>\r');
+
+        if(!rrd_graph($graphPath . '/disk_consumption_' . $period . '.png', $config)) {
+            $this->fail('Error writing connections graph for period '. $period  .' ['. rrd_error() .']');
+        }
     }
 }
 
