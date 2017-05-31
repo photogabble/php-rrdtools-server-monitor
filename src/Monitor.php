@@ -54,8 +54,8 @@ Class Monitor
         foreach ($this->monitors as $monitorName) {
             /** @var RRDBase $monitor */
             $monitor = new $monitorName($defaultConfig['storagePath'], $defaultConfig['debug']);
-            $className = explode('\\', get_class($monitor));
-            $className = end($className);
+            $className = $this->getClassNameFromPath(get_class($monitor));
+
             $defaultMonitorConfig = [
                 'enabled' => false,
             ];
@@ -114,7 +114,7 @@ Class Monitor
 
         /** @var RRDBase $monitor */
         foreach ($this->monitors as $name => $monitor) {
-            $graphs[$name] = $monitor->getGraphName();
+            $graphs[$this->getClassNameFromPath($name)] = $monitor->getGraphName();
         }
 
         $view = new View(__DIR__ . DIRECTORY_SEPARATOR . 'View' . DIRECTORY_SEPARATOR . 'dashboard.php');
@@ -132,5 +132,11 @@ Class Monitor
         $this->collect();
         $this->generateGraphs($periods);
         $this->writeHTML($periods);
+    }
+
+    private function getClassNameFromPath($classPath){
+        $className = explode('\\', $classPath);
+        $className = end($className);
+        return $className;
     }
 }
