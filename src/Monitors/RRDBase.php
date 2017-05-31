@@ -12,7 +12,23 @@ abstract class RRDBase
 
     protected $configuration = [];
 
-    protected function getGraphName ($period) {
+    public function __construct($path = __DIR__, $debug = false)
+    {
+        if (!file_exists($path)) {
+            echo "The path [$path] does not exist or is not readable.\n";
+            exit(1);
+        }
+        $this->path = $path;
+        $this->debug = $debug;
+        $this->rrdFilePath = $this->path . DIRECTORY_SEPARATOR . $this->rrdFileName;
+        //$this->touchGraph();
+    }
+
+    /**
+     * @param string $period
+     * @return string
+     */
+    public function getGraphName ($period) {
         if (strpos($this->graphName, 'changeme') !== false) {
             echo 'Graph name needs defining for ['. get_class($this) .']' . PHP_EOL;
             exit(1);
@@ -22,6 +38,8 @@ abstract class RRDBase
     }
 
     /**
+     * Retuns either the entire configuration upon no input or attempts to return by $key or $default on fail.
+     *
      * @param null|string $key
      * @param null|mixed $default
      * @return mixed
@@ -39,25 +57,21 @@ abstract class RRDBase
         return $this->configuration[$key];
     }
 
+    /**
+     * @param array $configuration
+     * @return bool
+     */
     public function setConfiguration(array $configuration)
     {
         $this->configuration = $configuration;
         return $this->configurationLoaded();
     }
 
-    public function __construct($path = __DIR__, $debug = false)
-    {
-        if (!file_exists($path)) {
-            echo "The path [$path] does not exist or is not readable.\n";
-            exit(1);
-        }
-        $this->path = $path;
-        $this->debug = $debug;
-        $this->rrdFilePath = $this->path . DIRECTORY_SEPARATOR . $this->rrdFileName;
-        //$this->touchGraph();
-    }
-
-    // Function to call after configuration is set
+    /**
+     * Function to call after configuration is set
+     *
+     * @return bool
+     */
     protected function configurationLoaded() {
         return true;
     }
