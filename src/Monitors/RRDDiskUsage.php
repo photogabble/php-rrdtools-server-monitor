@@ -158,7 +158,7 @@ class RRDDiskUsage extends RRDBase
         ];
 
         foreach ($this->configuration['devices'] as $device => $path) {
-            array_push($config, "DEF:{$device}TotalBytesUsed={$this->rrdFilePath[$device]}:BytesUsed:LAST");
+            array_push($config, "DEF:{$device}TotalBytesUsed={$this->rrdFilePath[$device]}:BytesUsed:MAX"); // MAX should be LAST but that doesnt work on older RRDTool versions
 
             array_push($config, "DEF:{$device}AvgUtil={$this->rrdFilePath[$device]}:Util:AVERAGE");
             array_push($config, "DEF:{$device}MaxUtil={$this->rrdFilePath[$device]}:Util:MAX");
@@ -172,7 +172,7 @@ class RRDDiskUsage extends RRDBase
                 "GPRINT:{$device}AvgUtil:MIN:  Min\\: %5.2lf%%",
                 "GPRINT:{$device}MaxUtil:MAX:  Max\\: %5.2lf%%",
                 "GPRINT:{$device}AvgUtil:AVERAGE: Avg\\: %5.2lf%%",
-                "GPRINT:{$device}TotalBytesUsed:LAST: Used\\: %5.2lf %sB\\n",
+                "GPRINT:{$device}TotalBytesUsed:MAX: Used\\: %5.2lf %sB\\n",
             ]);
         }
 
