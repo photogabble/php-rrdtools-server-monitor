@@ -1,38 +1,44 @@
 <?php
 
-require_once(__DIR__.'/RRDBase.php');
+namespace Carbontwelve\Monitor\Monitors;
 
-class RRDDiskUsage extends RRDBase {
+class RRDDiskUsage extends RRDBase
+{
+    protected $configuration = [
+        'devices' => []
+    ];
 
-    private $devices = [];
+    protected $graphName = 'disk_consumption_%period%.png';
 
-    public function __construct($path = __DIR__, $debug = false, array $device = ['nbd0' => '/dev/nbd0']){
-        parent::__construct($path, $debug);
-
-        $this->devices = $device;
+    protected function configurationLoaded()
+    {
+        if (count($this->configuration['devices']) < 1) {
+            return false;
+        }
         $this->rrdFilePath = [];
-
-        foreach ($this->devices as $device => $path) {
+        foreach ($this->configuration['devices'] as $device => $path) {
             $this->rrdFilePath[$device] = $this->path . DIRECTORY_SEPARATOR . 'diskusage-' . $device . '.rrd';
         }
-        $this->touchGraph();
+        return parent::configurationLoaded();
     }
 
-    protected function touchGraph()
+    public function touchGraph()
     {
-        if (count($this->devices) < 1) {
+        if (count($this->configuration['devices']) < 1) {
             return;
         }
-        foreach (array_keys($this->devices) as $device) {
+        foreach (array_keys($this->configuration['devices']) as $device) {
             $this->createGraph($device);
         }
     }
 
-    private function createGraph($device) {
+    private function createGraph($device)
+    {
         if (!file_exists($this->rrdFilePath[$device])) {
             $this->debug("Creating [{$this->rrdFilePath[$device]}]\n");
             if (!rrd_create($this->rrdFilePath[$device], [
-                "-s",60,
+                "-s",
+                60,
 
                 // bytes used
                 "DS:BytesUsed:GAUGE:120:0:U",
@@ -52,7 +58,8 @@ class RRDDiskUsage extends RRDBase {
                 "RRA:MAX:0.5:30:672",
                 "RRA:MAX:0.5:120:732",
                 "RRA:MAX:0.5:720:1460"
-            ])){
+            ])
+            ) {
                 $this->fail(rrd_error());
             }
         }
@@ -60,7 +67,7 @@ class RRDDiskUsage extends RRDBase {
 
     private function runCommand($cmd)
     {
-        $tmpPathName = $this->path . DIRECTORY_SEPARATOR . "diskusage.".time().".tmp";
+        $tmpPathName = $this->path . DIRECTORY_SEPARATOR . "diskusage." . time() . ".tmp";
         $cmd .= ' > ' . $tmpPathName;
         $this->debug("Executing: [$cmd]\n");
         exec($cmd);
@@ -98,14 +105,15 @@ class RRDDiskUsage extends RRDBase {
             "-t",
             implode(':', array_keys($stats)),
             'N:' . implode(':', array_values($stats))
-        ])){
+        ])
+        ) {
             $this->fail(rrd_error());
         }
     }
 
     public function collect()
     {
-        foreach ($this->devices as $device => $path) {
+        foreach ($this->configuration['devices'] as $device => $path) {
             $this->collectForDevice($device, $path);
         }
     }
@@ -129,28 +137,34 @@ class RRDDiskUsage extends RRDBase {
         ];
 
         $config = [
-            "-s","-1$period",
+            "-s",
+            "-1$period",
             "-t Disk Consumption in the last $period",
             "-z",
             "--lazy",
-            "-h", "150", "-w", "700",
+            "-h",
+            "150",
+            "-w",
+            "700",
             "-l 0",
-            "-b", "1024",
-            "-a", "PNG",
+            "-b",
+            "1024",
+            "-a",
+            "PNG",
             "--pango-markup",
             "--lower-limit=0",
             "--units-exponent=0",
             "-v Consumption %"
         ];
 
-        foreach ($this->devices as $device => $path) {
+        foreach ($this->configuration['devices'] as $device => $path) {
             array_push($config, "DEF:{$device}TotalBytesUsed={$this->rrdFilePath[$device]}:BytesUsed:LAST");
 
             array_push($config, "DEF:{$device}AvgUtil={$this->rrdFilePath[$device]}:Util:AVERAGE");
             array_push($config, "DEF:{$device}MaxUtil={$this->rrdFilePath[$device]}:Util:MAX");
         }
 
-        foreach ($this->devices as $device => $path) {
+        foreach ($this->configuration['devices'] as $device => $path) {
             $colour = array_shift($colours);
             $config = array_merge($config, [
                 "LINE2:{$device}AvgUtil{$colour}:" . $device,
@@ -162,18 +176,19 @@ class RRDDiskUsage extends RRDBase {
             ]);
         }
 
-        array_push($config, 'COMMENT:<span foreground="#ABABAB" size="x-small">'. date('D M jS H') . '\:' . date('i') . '\:' . date('s') .'</span>\r');
+        array_push($config,
+            'COMMENT:<span foreground="#ABABAB" size="x-small">' . date('D M jS H') . '\:' . date('i') . '\:' . date('s') . '</span>\r');
 
-        if(!rrd_graph($graphPath . '/disk_consumption_' . $period . '.png', $config)) {
-            $this->fail('Error writing connections graph for period '. $period  .' ['. rrd_error() .']');
+        if (!rrd_graph($graphPath . DIRECTORY_SEPARATOR . $this->getGraphName($period), $config)) {
+            $this->fail('Error writing connections graph for period ' . $period . ' [' . rrd_error() . ']');
         }
     }
 }
 
-$p = new RRDDiskUsage(__DIR__, true, ['nbd0' => '/dev/nbd0', 'nbd1' => '/dev/nbd1']);
-$p->collect();
-$p->graph('hour', __DIR__ . '/../httpdocs/img');
-$p->graph('day', __DIR__ . '/../httpdocs/img');
-$p->graph('week', __DIR__ . '/../httpdocs/img');
-$p->graph('month', __DIR__ . '/../httpdocs/img');
-$p->graph('year', __DIR__ . '/../httpdocs/img');
+// $p = new RRDDiskUsage(__DIR__, true, ['nbd0' => '/dev/nbd0', 'nbd1' => '/dev/nbd1']);
+// $p->collect();
+// $p->graph('hour', __DIR__ . '/../httpdocs/img');
+// $p->graph('day', __DIR__ . '/../httpdocs/img');
+// $p->graph('week', __DIR__ . '/../httpdocs/img');
+// $p->graph('month', __DIR__ . '/../httpdocs/img');
+// $p->graph('year', __DIR__ . '/../httpdocs/img');

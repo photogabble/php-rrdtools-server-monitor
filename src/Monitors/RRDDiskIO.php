@@ -1,32 +1,37 @@
 <?php
 
-require_once(__DIR__.'/RRDBase.php');
+namespace Carbontwelve\Monitor\Monitors;
 
 class RRDDiskIO extends RRDBase {
 
     protected $rrdFileName = 'diskio.rrd';
-    private $interval = 10;
-    private $iterations = 2;
-    private $devices = [];
 
-    public function __construct($path = __DIR__, $debug = false, array $device = ['nb0']){
-        parent::__construct($path, $debug);
+    protected $graphName = 'disk_usage_%period%.png';
 
-        $this->devices = $device;
+    protected $configuration = [
+        'interval' => 10,
+        'iterations' => 2,
+        'devices' => []
+    ];
+
+    protected function configurationLoaded()
+    {
+        if (count($this->configuration['devices']) < 1) {
+            return false;
+        }
         $this->rrdFilePath = [];
-
-        foreach ($this->devices as $device) {
+        foreach ($this->configuration['devices'] as $device) {
             $this->rrdFilePath[$device] = $this->path . DIRECTORY_SEPARATOR . 'diskio-' . $device . '.rrd';
         }
-        $this->touchGraph();
+        return parent::configurationLoaded();
     }
 
-    protected function touchGraph()
+    public function touchGraph()
     {
-        if (count($this->devices) < 1) {
+        if (count($this->configuration['devices']) < 1) {
             return;
         }
-        foreach ($this->devices as $device) {
+        foreach ($this->configuration['devices'] as $device) {
             $this->createGraph($device);
         }
     }
@@ -100,7 +105,7 @@ class RRDDiskIO extends RRDBase {
 
     private function collectForDevice($device)
     {
-        $stat = $this->runCommand("iostat -dxk {$device} {$this->interval} {$this->iterations}");
+        $stat = $this->runCommand("iostat -dxk {$device} {$this->configuration['interval']} {$this->configuration['iterations']}");
         $collect = false;
         $keys = [];
         $collection = [];
@@ -170,7 +175,7 @@ class RRDDiskIO extends RRDBase {
 
     public function collect()
     {
-        foreach ($this->devices as $device) {
+        foreach ($this->configuration['devices'] as $device) {
             $this->collectForDevice($device);
         }
     }
@@ -207,12 +212,12 @@ class RRDDiskIO extends RRDBase {
             "-v Utilization %"
         ];
 
-        foreach ($this->devices as $device) {
+        foreach ($this->configuration['devices'] as $device) {
             array_push($config, "DEF:{$device}Avg={$this->rrdFilePath[$device]}:Util:AVERAGE");
             array_push($config, "DEF:{$device}Max={$this->rrdFilePath[$device]}:Util:MAX");
         }
 
-        foreach ($this->devices as $device) {
+        foreach ($this->configuration['devices'] as $device) {
             $colour = array_shift($colours);
             $config = array_merge($config, [
                 "LINE2:{$device}Avg{$colour}:" . $device . ' Utilization',
@@ -225,17 +230,17 @@ class RRDDiskIO extends RRDBase {
 
         array_push($config, 'COMMENT:<span foreground="#ABABAB" size="x-small">'. date('D M jS H') . '\:' . date('i') . '\:' . date('s') .'</span>\r');
 
-        if(!rrd_graph($graphPath . '/disk_usage_' . $period . '.png', $config)) {
+        if(!rrd_graph($graphPath . DIRECTORY_SEPARATOR . $this->getGraphName($period), $config)) {
             $this->fail('Error writing connections graph for period '. $period  .' ['. rrd_error() .']');
         }
 
     }
 }
 
-$p = new RRDDiskIO(__DIR__, true, ['nb0', 'nb1']);
-$p->collect();
-$p->graph('hour', __DIR__ . '/../httpdocs/img');
-$p->graph('day', __DIR__ . '/../httpdocs/img');
-$p->graph('week', __DIR__ . '/../httpdocs/img');
-$p->graph('month', __DIR__ . '/../httpdocs/img');
-$p->graph('year', __DIR__ . '/../httpdocs/img');
+// $p = new RRDDiskIO(__DIR__, true, ['nb0', 'nb1']);
+// $p->collect();
+// $p->graph('hour', __DIR__ . '/../httpdocs/img');
+// $p->graph('day', __DIR__ . '/../httpdocs/img');
+// $p->graph('week', __DIR__ . '/../httpdocs/img');
+// $p->graph('month', __DIR__ . '/../httpdocs/img');
+// $p->graph('year', __DIR__ . '/../httpdocs/img');

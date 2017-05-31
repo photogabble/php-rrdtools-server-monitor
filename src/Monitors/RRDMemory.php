@@ -1,12 +1,14 @@
 <?php
 
-require_once(__DIR__.'/RRDBase.php');
+namespace Carbontwelve\Monitor\Monitors;
 
 class RRDMemory extends RRDBase {
 
     protected $rrdFileName = 'meminfo.rrd';
 
-    protected function touchGraph()
+    protected $graphName = 'memory_usage_%period%.png';
+
+    public function touchGraph()
     {
         if (!file_exists($this->rrdFilePath)) {
             $this->debug("Creating [$this->rrdFilePath]\n");
@@ -125,7 +127,7 @@ class RRDMemory extends RRDBase {
         }
 
         // Overall Memory Usage Graph
-        if(!rrd_graph($graphPath . '/memory_usage_' . $period . '.png', [
+        if(!rrd_graph($graphPath . DIRECTORY_SEPARATOR . $this->getGraphName($period), [
             "-s","-1$period",
             "-t Memory usage in the last $period",
             "-z",
@@ -208,10 +210,10 @@ class RRDMemory extends RRDBase {
     }
 }
 
-$p = new RRDMemory(__DIR__, true);
-$p->collect();
-$p->graph('hour', __DIR__ . '/../httpdocs/img');
-$p->graph('day', __DIR__ . '/../httpdocs/img');
-$p->graph('week', __DIR__ . '/../httpdocs/img');
-$p->graph('month', __DIR__ . '/../httpdocs/img');
-$p->graph('year', __DIR__ . '/../httpdocs/img');
+// $p = new RRDMemory(__DIR__, true);
+// $p->collect();
+// $p->graph('hour', __DIR__ . '/../httpdocs/img');
+// $p->graph('day', __DIR__ . '/../httpdocs/img');
+// $p->graph('week', __DIR__ . '/../httpdocs/img');
+// $p->graph('month', __DIR__ . '/../httpdocs/img');
+// $p->graph('year', __DIR__ . '/../httpdocs/img');

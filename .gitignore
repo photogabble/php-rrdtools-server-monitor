@@ -1,2 +1,5 @@
 *.rrd
 *.tmp
+
+/vendor/
+config.php

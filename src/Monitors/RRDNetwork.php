@@ -1,12 +1,14 @@
 <?php
 
-require_once(__DIR__.'/RRDBase.php');
+namespace Carbontwelve\Monitor\Monitors;
 
 class RRDNetwork extends RRDBase {
 
     protected $rrdFileName = 'ipconfig.rrd';
 
-    protected function touchGraph()
+    protected $graphName = 'network_%period%.png';
+
+    public function touchGraph()
     {
         if (!file_exists($this->rrdFilePath)) {
             $this->debug("Creating [$this->rrdFilePath]\n");
@@ -66,7 +68,7 @@ class RRDNetwork extends RRDBase {
             $this->fail("The path [$graphPath] does not exist or is not readable.\n");
         }
 
-        if(!rrd_graph($graphPath . '/network_' . $period . '.png', [
+        if(!rrd_graph($graphPath . DIRECTORY_SEPARATOR . $this->getGraphName($period), [
             "-s","-1$period",
             "-t eth0 traffic in the last $period",
             "--lazy",
@@ -76,7 +78,7 @@ class RRDNetwork extends RRDBase {
             "-v bytes/sec",
             "--slope-mode",
             "--pango-markup",
-            
+
             "DEF:in={$this->rrdFilePath}:in:AVERAGE",
             "DEF:maxin={$this->rrdFilePath}:in:MAX",
             "DEF:out={$this->rrdFilePath}:out:AVERAGE",
@@ -107,10 +109,10 @@ class RRDNetwork extends RRDBase {
     }
 }
 
-$p = new RRDNetwork(__DIR__, true);
-$p->collect();
-$p->graph('hour', __DIR__ . '/../httpdocs/img');
-$p->graph('day', __DIR__ . '/../httpdocs/img');
-$p->graph('week', __DIR__ . '/../httpdocs/img');
-$p->graph('month', __DIR__ . '/../httpdocs/img');
-$p->graph('year', __DIR__ . '/../httpdocs/img');
+// $p = new RRDNetwork(__DIR__, true);
+// $p->collect();
+// $p->graph('hour', __DIR__ . '/../httpdocs/img');
+// $p->graph('day', __DIR__ . '/../httpdocs/img');
+// $p->graph('week', __DIR__ . '/../httpdocs/img');
+// $p->graph('month', __DIR__ . '/../httpdocs/img');
+// $p->graph('year', __DIR__ . '/../httpdocs/img');

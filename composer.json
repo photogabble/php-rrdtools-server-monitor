@@ -1,0 +1,18 @@
+{
+    "name": "carbontwelve/monitor",
+    "description": "PHP & RRDTools System Monitor",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Simon Dann",
+            "email": "simon.dann@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Carbontwelve\\Monitor\\": "src"
+        }
+    },
+    "require": {}
+}
