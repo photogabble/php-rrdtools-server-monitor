@@ -28,10 +28,15 @@ abstract class RRDBase
      * @param string $period
      * @return string
      */
-    public function getGraphName ($period) {
+    public function getGraphName ($period = null) {
         if (strpos($this->graphName, 'changeme') !== false) {
             echo 'Graph name needs defining for ['. get_class($this) .']' . PHP_EOL;
             exit(1);
+        }
+
+        // For HTML output
+        if (is_null($period)) {
+            return str_replace('%period%.png', '', $this->graphName);
         }
 
         return str_replace('%period%', $period, $this->graphName);
