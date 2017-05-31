@@ -101,7 +101,7 @@ Class Monitor {
         /** @var RRDBase $monitor */
         foreach ($this->monitors as $monitor) {
             foreach ($periods as $period) {
-                $monitor->graph($period, $this->config['outputPath']);
+                $monitor->graph($period, $this->config['outputPath'] . '/img');
             }
         }
     }
