@@ -34,20 +34,13 @@
 
 <script>
     var lastUpdate = document.getElementById('last_update');
-    lastUpdate.textContent = getTimestamp().date;
-
-    <?php foreach ($graphs as $name => $graph) { ?>
-
-    <?php } ?>
+    lastUpdate.textContent = '<?= $timestamp ?>';
 
     var timeButtons = document.querySelectorAll('.timeBtn');
-    var nginxRequests = document.querySelector('#nginxRequests');
-    var nginxConnections = document.querySelector('#nginxConnections');
-    var cpuUsage = document.querySelector('#cpuUsage');
-    var networkTraffic = document.querySelector('#networkTraffic');
-    var memoryUsage = document.querySelector('#memoryUsage');
-    var diskUtilization = document.querySelector('#diskUtilization');
-    var diskConsumption = document.querySelector('#diskConsumption');
+
+    <?php foreach ($graphs as $name => $graph) { ?>
+    var <?= $name ?> = document.querySelector('#<?= $name ?>');
+    <?php } ?>
 
     for (var i = 0; i < timeButtons.length; i++) {
         timeButtons[i].addEventListener('click', function (e) {
@@ -58,13 +51,10 @@
             }
 
             this.classList.add('btn-primary');
-            nginxRequests.src = 'img/requests_' + this.dataset.time + '.png';
-            nginxConnections.src = 'img/connections_' + this.dataset.time + '.png';
-            cpuUsage.src = 'img/cpu_usage_' + this.dataset.time + '.png';
-            networkTraffic.src = 'img/network_' + this.dataset.time + '.png';
-            memoryUsage.src = 'img/memory_usage_' + this.dataset.time + '.png';
-            diskUtilization.src = 'img/disk_usage_' + this.dataset.time + '.png';
-            diskConsumption.src = 'img/disk_consumption_' + this.dataset.time + '.png';
+
+            <?php foreach ($graphs as $name => $graph) { ?>
+            <?= $name ?>.src = 'img/<?= $graph ?>' + this.dataset.time + '.png';
+            <?php } ?>
         });
     }
 </script>
