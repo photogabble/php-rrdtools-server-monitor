@@ -177,7 +177,7 @@ class RRDCpu extends RRDBase {
             "HRULE:0#000000"
 
         ])) {
-            $this->fail('Error writing connections graph for period '. $period  .' ['. rrd_error() .']');
+            $this->fail('Error writing CPU graph for period '. $period  .' ['. rrd_error() .']');
         }
     }
 }

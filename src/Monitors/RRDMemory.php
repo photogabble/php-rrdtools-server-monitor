@@ -205,7 +205,7 @@ class RRDMemory extends RRDBase {
             'COMMENT:<span foreground="#ABABAB" size="x-small">'. date('D M jS H') . '\:' . date('i') . '\:' . date('s') .'</span>\r'
 
         ])) {
-            $this->fail('Error writing connections graph for period '. $period  .' ['. rrd_error() .']');
+            $this->fail('Error writing Memory graph for period '. $period  .' ['. rrd_error() .']');
         }
     }
 }

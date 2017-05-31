@@ -180,7 +180,7 @@ class RRDDiskUsage extends RRDBase
             'COMMENT:<span foreground="#ABABAB" size="x-small">' . date('D M jS H') . '\:' . date('i') . '\:' . date('s') . '</span>\r');
 
         if (!rrd_graph($graphPath . DIRECTORY_SEPARATOR . $this->getGraphName($period), $config)) {
-            $this->fail('Error writing connections graph for period ' . $period . ' [' . rrd_error() . ']');
+            $this->fail('Error writing Disk Usage graph for period ' . $period . ' [' . rrd_error() . ']');
         }
     }
 }
