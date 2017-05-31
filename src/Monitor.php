@@ -11,7 +11,8 @@ use Carbontwelve\Monitor\Monitors\RRDMemory;
 use Carbontwelve\Monitor\Monitors\RRDNetwork;
 use Carbontwelve\Monitor\Monitors\RRDNginx;
 
-Class Monitor {
+Class Monitor
+{
 
     private $monitors = [
         RRDCpu::class,
@@ -34,12 +35,12 @@ Class Monitor {
             'debug' => true
         ];
 
-        if (! file_exists($defaultConfig['storagePath'])) {
+        if (!file_exists($defaultConfig['storagePath'])) {
             echo "Storage Path does not exist or is not writable." . PHP_EOL;
             exit(1);
         }
 
-        if (! file_exists($defaultConfig['outputPath'])) {
+        if (!file_exists($defaultConfig['outputPath'])) {
             echo "Output Path does not exist or is not writable." . PHP_EOL;
             exit(1);
         }
@@ -58,11 +59,11 @@ Class Monitor {
             $defaultMonitorConfig = [
                 'enabled' => false,
             ];
-            $monitorConfig = array_merge($defaultMonitorConfig,$monitor->getConfiguration());
+            $monitorConfig = array_merge($defaultMonitorConfig, $monitor->getConfiguration());
 
-            if (isset($config[$className])){
+            if (isset($config[$className])) {
                 $continue = $monitor->setConfiguration(array_merge($monitorConfig, $config[$className]));
-            }else{
+            } else {
                 $continue = $monitor->setConfiguration($monitorConfig);
             }
 
@@ -97,16 +98,18 @@ Class Monitor {
         }
     }
 
-    private function generateGraphs($periods = []) {
+    private function generateGraphs($periods = [])
+    {
         /** @var RRDBase $monitor */
         foreach ($this->monitors as $monitor) {
             foreach ($periods as $period) {
-                $monitor->graph($period, $this->config['outputPath'] . '/img');
+                $monitor->graph($period, $this->config['outputPath'] . DIRECTORY_SEPARATOR . 'img');
             }
         }
     }
 
-    private function writeHTML($periods = []) {
+    private function writeHTML($periods = [])
+    {
         $graphs = [];
 
         /** @var RRDBase $monitor */
@@ -122,7 +125,8 @@ Class Monitor {
         ]));
     }
 
-    public function run() {
+    public function run()
+    {
         $periods = ['hour', 'day', 'week', 'month', 'year'];
         $this->touchGraphs();
         $this->collect();
