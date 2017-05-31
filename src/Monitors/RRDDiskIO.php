@@ -6,6 +6,8 @@ class RRDDiskIO extends RRDBase {
 
     protected $rrdFileName = 'diskio.rrd';
 
+    protected $graphName = 'disk_usage_%period%.png';
+
     protected $configuration = [
         'interval' => 10,
         'iterations' => 2,
@@ -228,7 +230,7 @@ class RRDDiskIO extends RRDBase {
 
         array_push($config, 'COMMENT:<span foreground="#ABABAB" size="x-small">'. date('D M jS H') . '\:' . date('i') . '\:' . date('s') .'</span>\r');
 
-        if(!rrd_graph($graphPath . '/disk_usage_' . $period . '.png', $config)) {
+        if(!rrd_graph($graphPath . DIRECTORY_SEPARATOR . $this->getGraphName($period), $config)) {
             $this->fail('Error writing connections graph for period '. $period  .' ['. rrd_error() .']');
         }
 

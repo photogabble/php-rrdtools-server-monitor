@@ -6,6 +6,8 @@ class RRDCpu extends RRDBase {
 
     protected $rrdFileName = 'mpstat.rrd';
 
+    protected $graphName = 'cpu_usage_%period%.png';
+
     protected $configuration = [
         'interval' => 1
     ];
@@ -91,7 +93,7 @@ class RRDCpu extends RRDBase {
             $this->fail("The path [$graphPath] does not exist or is not readable.\n");
         }
 
-        if(!rrd_graph($graphPath . '/cpu_usage_' . $period . '.png', [
+        if(!rrd_graph($graphPath . DIRECTORY_SEPARATOR . $this->getGraphName($period), [
             "-s","-1$period",
             "-t CPU Usage in the last $period",
             "--lazy",

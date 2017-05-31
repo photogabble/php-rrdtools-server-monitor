@@ -6,6 +6,8 @@ class RRDMemory extends RRDBase {
 
     protected $rrdFileName = 'meminfo.rrd';
 
+    protected $graphName = 'memory_usage_%period%.png';
+
     public function touchGraph()
     {
         if (!file_exists($this->rrdFilePath)) {
@@ -125,7 +127,7 @@ class RRDMemory extends RRDBase {
         }
 
         // Overall Memory Usage Graph
-        if(!rrd_graph($graphPath . '/memory_usage_' . $period . '.png', [
+        if(!rrd_graph($graphPath . DIRECTORY_SEPARATOR . $this->getGraphName($period), [
             "-s","-1$period",
             "-t Memory usage in the last $period",
             "-z",

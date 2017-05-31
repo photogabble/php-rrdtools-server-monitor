@@ -8,6 +8,8 @@ class RRDDiskUsage extends RRDBase
         'devices' => []
     ];
 
+    protected $graphName = 'disk_consumption_%period%.png';
+
     protected function configurationLoaded()
     {
         if (count($this->configuration['devices']) < 1) {
@@ -177,7 +179,7 @@ class RRDDiskUsage extends RRDBase
         array_push($config,
             'COMMENT:<span foreground="#ABABAB" size="x-small">' . date('D M jS H') . '\:' . date('i') . '\:' . date('s') . '</span>\r');
 
-        if (!rrd_graph($graphPath . '/disk_consumption_' . $period . '.png', $config)) {
+        if (!rrd_graph($graphPath . DIRECTORY_SEPARATOR . $this->getGraphName($period), $config)) {
             $this->fail('Error writing connections graph for period ' . $period . ' [' . rrd_error() . ']');
         }
     }

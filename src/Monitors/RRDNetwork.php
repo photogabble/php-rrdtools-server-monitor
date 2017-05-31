@@ -6,6 +6,8 @@ class RRDNetwork extends RRDBase {
 
     protected $rrdFileName = 'ipconfig.rrd';
 
+    protected $graphName = 'network_%period%.png';
+
     public function touchGraph()
     {
         if (!file_exists($this->rrdFilePath)) {
@@ -66,7 +68,7 @@ class RRDNetwork extends RRDBase {
             $this->fail("The path [$graphPath] does not exist or is not readable.\n");
         }
 
-        if(!rrd_graph($graphPath . '/network_' . $period . '.png', [
+        if(!rrd_graph($graphPath . DIRECTORY_SEPARATOR . $this->getGraphName($period), [
             "-s","-1$period",
             "-t eth0 traffic in the last $period",
             "--lazy",

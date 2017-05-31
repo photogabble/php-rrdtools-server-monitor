@@ -6,6 +6,10 @@ namespace Carbontwelve\Monitor\Monitors;
 
 class RRDNginx extends RRDBase
 {
+    protected $rrdFileName = 'nginx.rrd';
+
+    protected $graphName = 'requests_%period%.png';
+
     protected $configuration = [
         'statsUrl' => ''
     ];
@@ -17,8 +21,6 @@ class RRDNginx extends RRDBase
         }
         return parent::configurationLoaded();
     }
-
-    protected $rrdFileName = 'nginx.rrd';
 
     public function touchGraph()
     {
@@ -83,7 +85,7 @@ class RRDNginx extends RRDBase
             $this->fail("The path [$graphPath] does not exist or is not readable.\n");
         }
 
-        if(!rrd_graph($graphPath . '/requests_' . $period . '.png', [
+        if(!rrd_graph($graphPath . DIRECTORY_SEPARATOR . $this->getGraphName($period), [
             "-s","-1$period",
             "-t Nginx Requests in the last $period",
             "--lazy",

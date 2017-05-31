@@ -5,11 +5,21 @@ namespace Carbontwelve\Monitor\Monitors;
 abstract class RRDBase
 {
     protected $rrdFileName = 'changeme.rrd';
+    protected $graphName = 'changeme_%period%.png';
     protected $rrdFilePath;
     protected $path;
     private $debug = false;
 
     protected $configuration = [];
+
+    protected function getGraphName ($period) {
+        if (strpos($this->graphName, 'changeme') !== false) {
+            echo 'Graph name needs defining for ['. get_class($this) .']' . PHP_EOL;
+            exit(1);
+        }
+
+        return str_replace('%period%', $period, $this->graphName);
+    }
 
     /**
      * @param null|string $key
