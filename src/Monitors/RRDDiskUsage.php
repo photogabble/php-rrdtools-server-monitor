@@ -92,9 +92,9 @@ class RRDDiskUsage extends RRDBase
         }
 
         $stats = [
-            'Util' => $stat[4],
-            'BytesUsed' => $stat[2] * 1024,
-            'BytesAvailable' => $stat[3] * 1024
+            'Util' => (int) $stat[4],
+            'BytesUsed' => (int) $stat[2] * 1024,
+            'BytesAvailable' => (int) $stat[3] * 1024
         ];
 
         if (strpos($stats['Util'], '%') !== false) {
@@ -158,8 +158,8 @@ class RRDDiskUsage extends RRDBase
         ];
 
         foreach ($this->configuration['devices'] as $device => $path) {
-            array_push($config, "DEF:{$device}TotalBytesUsed={$this->rrdFilePath[$device]}:BytesUsed:MAX"); // MAX should be LAST but that doesnt work on older RRDTool versions
-
+            // MAX should be LAST but that doesn't work on older RRDTool versions
+            array_push($config, "DEF:{$device}TotalBytesUsed={$this->rrdFilePath[$device]}:BytesUsed:MAX");
             array_push($config, "DEF:{$device}AvgUtil={$this->rrdFilePath[$device]}:Util:AVERAGE");
             array_push($config, "DEF:{$device}MaxUtil={$this->rrdFilePath[$device]}:Util:MAX");
         }
@@ -184,11 +184,3 @@ class RRDDiskUsage extends RRDBase
         }
     }
 }
-
-// $p = new RRDDiskUsage(__DIR__, true, ['nbd0' => '/dev/nbd0', 'nbd1' => '/dev/nbd1']);
-// $p->collect();
-// $p->graph('hour', __DIR__ . '/../httpdocs/img');
-// $p->graph('day', __DIR__ . '/../httpdocs/img');
-// $p->graph('week', __DIR__ . '/../httpdocs/img');
-// $p->graph('month', __DIR__ . '/../httpdocs/img');
-// $p->graph('year', __DIR__ . '/../httpdocs/img');
